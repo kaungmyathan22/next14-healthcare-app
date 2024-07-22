@@ -1,6 +1,7 @@
-import PatientForm from "@/components/forms/PatientForm";
+import { PatientForm } from "@/components/forms/PatientForm";
 import Image from "next/image";
 import Link from "next/link";
+import { LogoImage } from "../components/LogoImage";
 
 export default function Home() {
   return (
@@ -27,21 +28,6 @@ export default function Home() {
         alt="patient"
         className="side-img max-w-[50%]"
       />
-    </div>
-  );
-}
-
-function LogoImage({}) {
-  return (
-    <div className="flex flex-row items-center mb-12 gap-3">
-      <Image
-        src="/assets/icons/logo-icon.svg"
-        height={1000}
-        width={1000}
-        alt="patient"
-        className="h-10 w-fit"
-      />
-      <p className="text-2xl font-bold">Medicare</p>
     </div>
   );
 }
