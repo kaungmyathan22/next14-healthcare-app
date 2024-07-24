@@ -19,6 +19,7 @@ import {
 } from "@/constants";
 import { PatientFormValidation } from "@/lib/validation";
 
+import { registerPatient } from "@/lib/actions/patient.actions";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-phone-number-input/style.css";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
@@ -41,7 +42,7 @@ const RegisterForm = ({ user }: { user: User }) => {
 
   const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
     setIsLoading(true);
-
+    console.log({ values });
     // Store file info in form data as
     let formData;
     if (
@@ -84,11 +85,11 @@ const RegisterForm = ({ user }: { user: User }) => {
         privacyConsent: values.privacyConsent,
       };
 
-      // const newPatient = await registerPatient(patient);
+      const newPatient = await registerPatient(patient);
 
-      // if (newPatient) {
-      //   router.push(`/patients/${user.$id}/new-appointment`);
-      // }
+      if (newPatient) {
+        router.push(`/patients/${user.$id}/new-appointment`);
+      }
     } catch (error) {
       console.log(error);
     }
