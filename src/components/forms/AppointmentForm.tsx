@@ -1,25 +1,36 @@
 "use client";
-import { Doctors } from "@/constants";
-import { getAppointmentSchema } from "@/lib/validation";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SelectItem } from "@radix-ui/react-select";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { SelectItem } from "@/components/ui/select";
+import { Doctors } from "@/constants";
+import { createAppointment } from "@/lib/actions/appointment.actions";
+import { getAppointmentSchema } from "@/lib/validation";
+import { Appointment } from "@/types/appwrite.types";
+
+import "react-datepicker/dist/react-datepicker.css";
+
 import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { Form } from "../ui/form";
 
-const AppointmentForm = ({
+export const AppointmentForm = ({
   userId,
   patientId,
   type = "create",
+  appointment,
+  setOpen,
 }: {
   userId: string;
   patientId: string;
   type: "create" | "schedule" | "cancel";
+  appointment?: Appointment;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -29,20 +40,60 @@ const AppointmentForm = ({
   const form = useForm<z.infer<typeof AppointmentFormValidation>>({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
-      // primaryPhysician: appointment ? appointment?.primaryPhysician : "",
-      // schedule: appointment
-      //   ? new Date(appointment?.schedule!)
-      //   : new Date(Date.now()),
-      // reason: appointment ? appointment.reason : "",
-      // note: appointment?.note || "",
-      // cancellationReason: appointment?.cancellationReason || "",
+      primaryPhysician: appointment ? appointment?.primaryPhysician : "",
+      schedule: appointment
+        ? new Date(appointment?.schedule!)
+        : new Date(Date.now()),
+      reason: appointment ? appointment.reason : "",
+      note: appointment?.note || "",
+      cancellationReason: appointment?.cancellationReason || "",
     },
   });
+
   const onSubmit = async (
     values: z.infer<typeof AppointmentFormValidation>
   ) => {
     setIsLoading(true);
+
+    let status;
+    switch (type) {
+      case "schedule":
+        status = "scheduled";
+        break;
+      case "cancel":
+        status = "cancelled";
+        break;
+      default:
+        status = "pending";
+    }
+
+    try {
+      if (type === "create" && patientId) {
+        const appointment = {
+          userId,
+          patient: patientId,
+          primaryPhysician: values.primaryPhysician,
+          schedule: new Date(values.schedule),
+          reason: values.reason!,
+          status: status as Status,
+          note: values.note,
+        };
+
+        const newAppointment = await createAppointment(appointment);
+
+        if (newAppointment) {
+          form.reset();
+          router.push(
+            `/patients/${userId}/new-appointment/success?appointmentId=${newAppointment.$id}`
+          );
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setIsLoading(false);
   };
+
   let buttonLabel;
   switch (type) {
     case "cancel":
@@ -54,9 +105,19 @@ const AppointmentForm = ({
     default:
       buttonLabel = "Submit Apppointment";
   }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-6">
+        {type === "create" && (
+          <section className="mb-12 space-y-4">
+            <h1 className="header">New Appointment</h1>
+            <p className="text-dark-700">
+              Request a new appointment in 10 seconds.
+            </p>
+          </section>
+        )}
+
         {type !== "cancel" && (
           <>
             <CustomFormField
@@ -139,5 +200,3 @@ const AppointmentForm = ({
     </Form>
   );
 };
-
-export default AppointmentForm;
