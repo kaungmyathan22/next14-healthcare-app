@@ -1,13 +1,16 @@
+import Mounted from "@/components/Mounted";
 import { PatientForm } from "@/components/forms/PatientForm";
 import Image from "next/image";
 import Link from "next/link";
+import { PasskeyModal } from "../../original/components/PasskeyModal";
 import { LogoImage } from "../components/LogoImage";
-import Mounted from "@/components/Mounted";
 
-export default function Home() {
+export default function Home({ searchParams }: SearchParamProps) {
+  const isAdmin = searchParams?.admin === "true";
   return (
     <Mounted>
       <div className="flex h-screen max-h-screen">
+        {isAdmin && <PasskeyModal />}
         <section className="remove-scrollbar container my-auto">
           <div className="sub-container max-w-[496px]">
             <LogoImage />
