@@ -3,6 +3,8 @@ import Mounted from "@/components/Mounted";
 import { StatCard } from "@/components/StatCard";
 import Link from "next/link";
 import { getRecentAppointmentList } from "../../../original/lib/actions/appointment.actions";
+import { DataTable } from "../../../original/components/table/DataTable";
+import { columns } from "../../../original/components/table/columns";
 
 const Admin = async () => {
   const appointments = await getRecentAppointmentList();
@@ -45,6 +47,7 @@ const Admin = async () => {
               icon={"/assets/icons/cancelled.svg"}
             />
           </section>
+          <DataTable columns={columns} data={appointments.documents} />
         </main>
       </div>
     </Mounted>
