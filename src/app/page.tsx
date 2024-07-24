@@ -1,8 +1,8 @@
 import Mounted from "@/components/Mounted";
+import { PasskeyModal } from "@/components/PasskeyModal";
 import { PatientForm } from "@/components/forms/PatientForm";
 import Image from "next/image";
 import Link from "next/link";
-import { PasskeyModal } from "../../original/components/PasskeyModal";
 import { LogoImage } from "../components/LogoImage";
 
 export default function Home({ searchParams }: SearchParamProps) {
